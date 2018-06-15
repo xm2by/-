@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>图片上传预览</title>
+  <style>
+    .img-box{
+      box-sizing: border-box;
+      width: 500px;
+      height: 300px;
+      padding: 10px;
+      border: 1px solid blue;
+      margin: 50px auto;
+      list-style: none;
+    }
+    .img-item{
+      position: relative;
+      display: inline-block;
+      box-sizing: border-box;
+      width: 100px;
+      height: 100px;
+      border: 1px solid #eee;
+      vertical-align: top;
+    }
+    .img-item>img{
+      width: 100%;
+      height: 100%;
+    }
+    .img-item .img-delete{
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: 20px;
+      height: 20px;
+      background: red;
+      cursor: pointer;
+    }
+    .input-box{
+      position: absolute;
+      clip: rect(0, 0, 0, 0);
+    }
+    .img-upload{
+      display: inline-block;
+      box-sizing: border-box;
+      width: 100%;
+      height: 100%;
+      text-align: center;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <ul class="img-box">
+    <li class="img-item operation">
+      <input id="imgUpload" class="input-box" type="file">
+      <label for="imgUpload" class="img-upload">上传图片</label>
+    </li>
+  </ul>
+  <script>
+
+    const inputEle = document.querySelectorAll('.input-box')[0], // 获取input元素
+          fileReader = new FileReader(), // 实例化FileReader对象，用于读取所选择的文件
+          imgBox = document.querySelectorAll('.img-box')[0]; // 获取图片容器
+
+    let file = null, // 盛放所选择的文件
+        imgArr = []; // 存放上传图片的地址
+
+    // 监听input元素的change事件
+    inputEle.addEventListener('change', function(event){
+
+      // console.log(event);
+      // 选择文件的信息
+      file = event.target.files[0];
+
+      // 读取文件，将读取的文件转化为URL地址
+      file && fileReader.readAsDataURL(file);
+
+      fileReader.onload = function(event){
+        // 将读取后文件的地址存放在imgArr中
+        imgArr.push(event.target.result);
+
+        // 将上传的图片渲染出预览图
+        if(imgArr && imgArr.length){
+          // 创建img元素、li元素、i元素
+          const imgNode = document.createElement('img'),
+                liNode = document.createElement('li'),
+                iNode = document.createElement('i');
+          // 将新选中的图片地址传给img的src
+          imgNode.src = imgArr[imgArr.length-1];
+          // 给li元素和i元素添加类
+          liNode.className = 'img-item';
+          iNode.className = 'img-delete';
+          // 将图片和删除按钮添加给li元素
+          liNode.appendChild(imgNode);
+          liNode.appendChild(iNode);
+          // 将li元素添加到上传图片按钮之前
+          document.querySelectorAll('.img-box')[0].insertBefore(liNode, document.querySelectorAll('.operation')[0]);
+        }
+      }
+    })
+
+    // 监听图片容器的点击事件
+    imgBox.addEventListener('click', function(event){
+      // console.log('1111', event);
+      // 将点击事件委托给i元素
+      if(event.target.nodeName.toLowerCase() === 'i'){
+        // 通过遍历所有i元素与当前点击的i元素对比，确定当前点击的是哪一张图，即index值
+        const deleteButtons = document.querySelectorAll('.img-delete');
+        let index = 0;
+        deleteButtons.forEach((val, key) =>{
+          // console.log('2222', val)；
+          if(val === event.target){
+            index = key;
+          }
+        })
+        // console.log('3333', index);
+        // 删除点击删除按钮图片的地址
+        imgArr.splice(index, 1);
+        // 在页面中删除点击删除按钮对应的图片
+        imgBox.removeChild(document.querySelectorAll('.img-item')[index]);
+      }
+    })
+  </script>
+</body>
+</html>
